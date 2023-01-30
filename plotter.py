@@ -39,6 +39,8 @@ def update(a):
 
 ani = animation.FuncAnimation(fig, update)
 
+plt.xlabel("data point")
+plt.ylabel("Voltage (V)")
 plt.legend()
 plt.show()
 
