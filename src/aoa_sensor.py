@@ -50,3 +50,6 @@ class AoaSensor:
         
         print("\n\n\n")
 
+    def pressure_sensor_voltage(self, pressure_sensor: int) -> float:
+        return self._pressure_sensors[pressure_sensor].voltage
+        
