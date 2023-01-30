@@ -19,7 +19,7 @@ max_x = 200
 maxy = 4
 
 x = np.arange(0, max_x)
-ax.set_ylim(0, 4)
+ax.set_ylim(-2, 2)
 
 data = {}
 

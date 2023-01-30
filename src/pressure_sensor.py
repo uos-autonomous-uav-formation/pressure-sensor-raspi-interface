@@ -22,19 +22,24 @@ class PressureSensor:
         self._start_up_safety_checks()
 
         # Peform zeroing
+        self._zero = self._raw_voltage
 
 
     def _start_up_safety_checks(self):
-        if self.voltage < self._min_voltage_check:
+        if self._raw_voltage < self._min_voltage_check:
             raise ValueError(f"Voltage too low for {self.channel}. Check if sensor working and wiring connected.")
     
     @property
-    def pressure(self):
-        return (self._input.voltage / (5 * 0.2)) - 0.5
+    def _raw_pressure(self):
+        return (self._raw_voltage / (5 * 0.2)) - 0.5
+
+    @property
+    def _raw_voltage(self):
+        return self._input.voltage
 
     @property
     def voltage(self):
-        return self._input.voltage
+        return self._raw_voltage - self._zero
 
     @property
     def theoretical_error(self):
