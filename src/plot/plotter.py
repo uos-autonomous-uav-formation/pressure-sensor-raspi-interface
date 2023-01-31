@@ -16,7 +16,6 @@ aoa_1 = AoaSensor(spi, board.D7, 3.3)
 fig, ax = plt.subplots()
 
 max_x = 200
-maxy = 4
 
 x = np.arange(0, max_x)
 ax.set_ylim(-1.5, 1.5)
@@ -32,7 +31,7 @@ for i in [1, 2, 3, 4, 5]:
 def update(a):
     for i in data.keys(): 
         data[i]["ydata"].pop(0)
-        data[i]["ydata"].append(aoa_1.pressure_sensor_voltage(i))
+        data[i]["ydata"].append(aoa_1.pressure_sensor_dvoltage(i))
         data[i]["line"].set_ydata(data[i]["ydata"])
 
 

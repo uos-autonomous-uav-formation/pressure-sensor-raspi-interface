@@ -7,7 +7,7 @@ from numbers import Number
 class PressureSensor:
     _min_voltage_check: float = 0.3 # When performing start up safety checks, 
     
-    zero: int = None
+    _zero: int = 0
 
     def __init__(self, mcp: MCP.MCP3008, channel: int, ref_voltage: Number):
         """ Interface for a MPXV7002DP pressure sensor via a MCP analogue to digital converter.
@@ -22,25 +22,29 @@ class PressureSensor:
         self._start_up_safety_checks()
 
         # Peform zeroing
-        self._zero = self._raw_voltage
+        self._zero = self.voltage
 
 
     def _start_up_safety_checks(self):
-        if self._raw_voltage < self._min_voltage_check:
+        if self.voltage < self._min_voltage_check:
             raise ValueError(f"Voltage too low for {self.channel}. Check if sensor working and wiring connected.")
     
     @property
-    def _raw_pressure(self):
-        return (self._raw_voltage / (5 * 0.2)) - 0.5
+    def raw_pressure(self) -> float:
+        """Raw pressure difference from the sensor"""
+        return (self.voltage / (5 * 0.2)) - 0.5
 
     @property
-    def _raw_voltage(self):
+    def voltage(self) -> float:
+        """Volage without calibration"""
         return self._input.voltage
 
     @property
-    def voltage(self):
+    def dvoltage(self) -> float:
+        """Volage difference from the calibrated zero value"""
         return self._raw_voltage - self._zero
 
     @property
     def theoretical_error(self):
         pass
+    

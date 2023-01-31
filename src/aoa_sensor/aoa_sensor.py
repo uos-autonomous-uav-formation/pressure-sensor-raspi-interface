@@ -39,7 +39,7 @@ class AoaSensor:
         self._allocate_pressure_sensor(orientation)
 
     def _allocate_pressure_sensor(self, orientation):
-        self._pressure_sensors = {}
+        self._pressure_sensors: dict[int, PressureSensor] = {}
         
         for key, item in orientation.items():
             self._pressure_sensors[key] = PressureSensor(self._mcp, item, ref_voltage=self.ref_voltage)
@@ -52,4 +52,6 @@ class AoaSensor:
 
     def pressure_sensor_voltage(self, pressure_sensor: int) -> float:
         return self._pressure_sensors[pressure_sensor].voltage
-        
+    
+    def pressure_sensor_dvoltage(self, pressure_sensor: int) -> float:
+        return self._pressure_sensors[pressure_sensor].dvoltage
