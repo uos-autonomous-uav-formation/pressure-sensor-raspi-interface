@@ -1,7 +1,7 @@
 import busio
 import board
 import numpy as np
-from src import AoaSensor
+from src.aoa_sensor import AoaSensor
 from matplotlib import animation
 from matplotlib import pyplot as plt
 
