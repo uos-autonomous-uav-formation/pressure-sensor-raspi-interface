@@ -42,7 +42,7 @@ class PressureSensor:
     @property
     def dvoltage(self) -> float:
         """Volage difference from the calibrated zero value"""
-        return self._raw_voltage - self._zero
+        return self.voltage - self._zero
 
     @property
     def theoretical_error(self):
