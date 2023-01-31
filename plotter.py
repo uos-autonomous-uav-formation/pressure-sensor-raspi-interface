@@ -19,7 +19,7 @@ max_x = 200
 maxy = 4
 
 x = np.arange(0, max_x)
-ax.set_ylim(-2, 2)
+ax.set_ylim(-1.5, 1.5)
 
 data = {}
 
@@ -44,4 +44,14 @@ plt.ylabel("Voltage (V)")
 plt.legend()
 plt.show()
 
-ani.save("test")
+
+# The following is for the animation to live long enough, it will cause an exception but this is on purpose.
+# In theory plt.show() should handle this lifetime but it is not doing so.
+try:
+    ani.save("test.mp3")
+
+except ValueError:
+    pass
+
+except Exception as e:
+    print(e)
