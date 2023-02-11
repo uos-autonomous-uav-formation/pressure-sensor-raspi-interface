@@ -17,8 +17,8 @@ fig, ax = plt.subplots()
 
 max_x = 200
 
-x = np.arange(0, max_x)
-ax.set_ylim(-1.5, 1.5)
+x = np.arange(0, max_x) 
+ax.set_ylim(-0.5, 0.5)
 
 data = {}
 
