@@ -19,10 +19,11 @@ class PressureSensor:
         self.channel = channel
 
         # Perform start up checks
-        self._start_up_safety_checks()
+        #self._start_up_safety_checks()
 
-        # Peform zeroing
+        # Peform zeroing (add time average for zeroing and save)
         self._zero = self.voltage
+        print(self._zero)
 
 
     def _start_up_safety_checks(self):
@@ -42,7 +43,7 @@ class PressureSensor:
     @property
     def dvoltage(self) -> float:
         """Volage difference from the calibrated zero value"""
-        return self._raw_voltage - self._zero
+        return self.voltage - self._zero
 
     @property
     def theoretical_error(self):

@@ -55,3 +55,6 @@ class AoaSensor:
     
     def pressure_sensor_dvoltage(self, pressure_sensor: int) -> float:
         return self._pressure_sensors[pressure_sensor].dvoltage
+
+    def pressure_sensor_zero(self, pressure_sensor: int) -> float:
+        return self._pressure_sensors[pressure_sensor]._zero
