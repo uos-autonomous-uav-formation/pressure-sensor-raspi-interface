@@ -5,8 +5,9 @@ from .pressure_sensor import PressureSensor
 
 
 class AoaSensor:
-    
-    def __init__(self, spi, chip_select, ref_voltage, 
+    id: int
+
+    def __init__(self, id, spi, chip_select, ref_voltage, 
     orientation: dict[int, int] = None):
         """
         Angle of attack sensor implementation using MCP3008.
@@ -37,6 +38,7 @@ class AoaSensor:
         self._mcp = MCP.MCP3008(spi, self._chip_select, ref_voltage=ref_voltage)
         self.ref_voltage = ref_voltage
         self._allocate_pressure_sensor(orientation)
+        self.id = id
 
     def _allocate_pressure_sensor(self, orientation):
         self._pressure_sensors: dict[int, PressureSensor] = {}

@@ -23,6 +23,7 @@ if args.record:
 
     spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
 
-    aoa_1 = AoaSensor(spi, board.D7, 3.3)
+    aoa_2 = AoaSensor(2, spi, board.D20, 5)
+    aoa_1 = AoaSensor(1, spi, board.D7, 5)
 
-    data_recording(aoa_1)
+    data_recording([aoa_1, aoa_2])

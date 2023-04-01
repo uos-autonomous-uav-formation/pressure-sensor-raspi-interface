@@ -38,6 +38,7 @@ class PressureSensor:
     @property
     def voltage(self) -> float:
         """Volage without calibration"""
+        print(self._input.voltage)
         return self._input.voltage
 
     @property
