@@ -2,13 +2,25 @@ import digitalio
 import board
 import adafruit_mcp3xxx.mcp3008 as MCP
 from .pressure_sensor import PressureSensor
+import numpy as np
+from dataclasses import dataclass
+
+
+@dataclass(init=True)
+class AoAConfig:
+    val1: float
+    val2: float
+
+
+AoA1_conf = AoAConfig(val1=0.3630852, val2=-0.131146)
+AoA2_conf = AoAConfig(val1=0.1877579, val2=-0.13755193)
 
 
 class AoaSensor:
     id: int
 
-    def __init__(self, id, spi, chip_select, ref_voltage, 
-    orientation: dict[int, int] = None):
+    def __init__(self, id, spi, chip_select, ref_voltage, aoa_conf: AoAConfig,
+                 orientation: dict[int, int] = None):
         """
         Angle of attack sensor implementation using MCP3008.
 
@@ -35,6 +47,7 @@ class AoaSensor:
                 raise ValueError("Pin value too low for an MCP3008 chip, minimum value 0")
 
         self._chip_select = digitalio.DigitalInOut(chip_select)
+        self._aoa_conf = aoa_conf
         self._mcp = MCP.MCP3008(spi, self._chip_select, ref_voltage=ref_voltage)
         self.ref_voltage = ref_voltage
         self._allocate_pressure_sensor(orientation)
@@ -42,19 +55,13 @@ class AoaSensor:
 
     def _allocate_pressure_sensor(self, orientation):
         self._pressure_sensors: dict[int, PressureSensor] = {}
-        
+
         for key, item in orientation.items():
             self._pressure_sensors[key] = PressureSensor(self._mcp, item, ref_voltage=self.ref_voltage)
 
-    def dbg(self):
-        for key, item in self._pressure_sensors.items():
-            print(f"Probe location {key}, Channel {item.channel}, pressure sensor: {item.pressure} Voltage {item.voltage}")
-        
-        print("\n\n\n")
-
     def pressure_sensor_voltage(self, pressure_sensor: int) -> float:
         return self._pressure_sensors[pressure_sensor].voltage
-    
+
     def pressure_sensor_dvoltage(self, pressure_sensor: int) -> float:
         return self._pressure_sensors[pressure_sensor].dvoltage
 
@@ -63,23 +70,9 @@ class AoaSensor:
 
     def aoa_corr_pressure(self, pressure_sensor: int) -> float:
         Vdd = 3.3
-        return 525*(np.sign((self._pressure_sensors[pressure_sensor].voltage/Vdd)-0.5))*(((self._pressure_sensors[pressure_sensor].voltage/(Vdd*0.4))-1.25)**2)
+        return 525 * (np.sign((self.pressure_sensor_voltage(pressure_sensor) / Vdd) - 0.5)) * (((self.pressure_sensor_voltage(pressure_sensor) / (Vdd * 0.4)) - 1.25) ** 2)
 
-
-    def alpha_aoa1(self, pressure_sensor: int) -> float:    #gives AOA of Angle of attack sensor 1
-        p_avg = (self.aoa_corr_pressure(1) + self.aoa_corr_pressure(2) + self.aoa_corr_pressure(3) + self.aoa_corr_pressure(4))/4
-        cp_alpha = (self.aoa_corr_pressure(1) - self.aoa_corr_pressure(3)) / (self.aoa_corr_pressure(5) - self.p_avg)
-        return (cp_alpha + 0.3630852)/-0.131146 # return aoa 1
-
-    def alpha_aoa2(self, pressure_sensor: int) -> float:  #gives AOA of Angle of attack sensor 2
-        p_avg = (self.aoa_corr_pressure(1) + self.aoa_corr_pressure(2) + self.aoa_corr_pressure(
-            3) + self.aoa_corr_pressure(4)) / 4
-        cp_alpha = (self.aoa_corr_pressure(1) - self.aoa_corr_pressure(3)) / (self.aoa_corr_pressure(5) - self.p_avg)
-        return (cp_alpha + 0.1877579) / -0.13755193  # return aoa2
-
-
-
-
-
-
-
+    def alpha_aoa(self) -> float:  # gives AOA of Angle of attack sensor 1
+        p_avg = (self.aoa_corr_pressure(1) + self.aoa_corr_pressure(2) + self.aoa_corr_pressure(3) + self.aoa_corr_pressure(4)) / 4
+        cp_alpha = (self.aoa_corr_pressure(1) - self.aoa_corr_pressure(3)) / (self.aoa_corr_pressure(5) - p_avg)
+        return (cp_alpha + self._aoa_conf.val1) / self._aoa_conf.val2  # return aoa 1
