@@ -69,13 +69,13 @@ class AoaSensor:
     def alpha_aoa1(self, pressure_sensor: int) -> float:    #gives AOA of Angle of attack sensor 1
         p_avg = (self.aoa_corr_pressure(1) + self.aoa_corr_pressure(2) + self.aoa_corr_pressure(3) + self.aoa_corr_pressure(4))/4
         cp_alpha = (self.aoa_corr_pressure(1) - self.aoa_corr_pressure(3)) / (self.aoa_corr_pressure(5) - self.p_avg)
-        return (cp_alpha + 0.3630852)/-0.131146
+        return (cp_alpha + 0.3630852)/-0.131146 # return aoa 1
 
     def alpha_aoa2(self, pressure_sensor: int) -> float:  #gives AOA of Angle of attack sensor 2
         p_avg = (self.aoa_corr_pressure(1) + self.aoa_corr_pressure(2) + self.aoa_corr_pressure(
             3) + self.aoa_corr_pressure(4)) / 4
         cp_alpha = (self.aoa_corr_pressure(1) - self.aoa_corr_pressure(3)) / (self.aoa_corr_pressure(5) - self.p_avg)
-        return (cp_alpha + 0.1877579) / -0.13755193
+        return (cp_alpha + 0.1877579) / -0.13755193  # return aoa2
 
 
 
