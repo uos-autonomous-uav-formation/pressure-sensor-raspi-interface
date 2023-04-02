@@ -11,28 +11,34 @@ REF_VOLTAGE = 5
 # create the spi bus
 spi = busio.SPI(clock=board.SCK, MISO=board.MISO, MOSI=board.MOSI)
 
-aoa_1 = AoaSensor(spi, board.D7, 3.3)
+aoa = [AoaSensor(0, spi, board.D7, 5), AoaSensor(1, spi, board.D20, 5)]
 
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(ncols=2)
 
 max_x = 200
 
 x = np.arange(0, max_x) 
-ax.set_ylim(-0.5, 0.5)
+ax[0].set_ylim(0, 3.3)
+ax[1].set_ylim(0, 3.3)
+
 
 data = {}
 
-for i in [1, 2, 3, 4, 5]:
-    data[i] = {}
-    data[i]["ydata"] = [0] * len(x)
-    data[i]["line"], = ax.plot(x, data[i]["ydata"], label=f"Pressure sensor {i}")
+for aoa_sensor in aoa:
+    data[aoa_sensor.id] = {}
+    for i in [1, 2, 3, 4, 5]:
+        data[aoa_sensor.id][i] = {}
+        data[aoa_sensor.id][i]["ydata"] = [0] * len(x)
+        ax[aoa_sensor.id].set_title(f"for aoa {aoa_sensor.id}")
+        data[aoa_sensor.id][i]["line"], = ax[aoa_sensor.id].plot(x, data[aoa_sensor.id][i]["ydata"], label=f"Pressure sensor {i}")
 
 
 def update(a):
-    for i in data.keys(): 
-        data[i]["ydata"].pop(0)
-        data[i]["ydata"].append(aoa_1.pressure_sensor_dvoltage(i))
-        data[i]["line"].set_ydata(data[i]["ydata"])
+    for aoa_sensor in aoa:
+        for i in data[aoa_sensor.id].keys():
+            data[aoa_sensor.id][i]["ydata"].pop(0)
+            data[aoa_sensor.id][i]["ydata"].append(aoa_sensor.pressure_sensor_voltage(i))
+            data[aoa_sensor.id][i]["line"].set_ydata(data[aoa_sensor.id][i]["ydata"])
 
 
 
