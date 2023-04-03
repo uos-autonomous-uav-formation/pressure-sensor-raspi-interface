@@ -14,8 +14,8 @@ class AoAConfig:
     val4: float
 
 
-AoA1_conf = AoAConfig(val1=0.3630852, val2=-0.131146, val3=0 , val4= 0)
-AoA2_conf = AoAConfig(val1=0.1877579, val2=-0.13755193, val3=0, val4=0)
+AoA1_conf = AoAConfig(val1=0.3630852, val2=-0.131146, val3=-0.04228435 , val4= -0.13692735)
+AoA2_conf = AoAConfig(val1=0.1877579, val2=-0.13755193, val3=0.24853187, val4=-0.16666902)
 
 
 class AoaSensor:
