@@ -10,10 +10,12 @@ from dataclasses import dataclass
 class AoAConfig:
     val1: float
     val2: float
+    val3: float
+    val4: float
 
 
-AoA1_conf = AoAConfig(val1=0.3630852, val2=-0.131146)
-AoA2_conf = AoAConfig(val1=0.1877579, val2=-0.13755193)
+AoA1_conf = AoAConfig(val1=0.3630852, val2=-0.131146, val3=0 , val4= 0)
+AoA2_conf = AoAConfig(val1=0.1877579, val2=-0.13755193, val3=0, val4=0)
 
 
 class AoaSensor:
@@ -68,11 +70,21 @@ class AoaSensor:
     def pressure_sensor_zero(self, pressure_sensor: int) -> float:
         return self._pressure_sensors[pressure_sensor]._zero
 
-    def aoa_corr_pressure(self, pressure_sensor: int) -> float:
+    def aoa_corr_voltage(self) -> float:
+        corr_factor = (0.0114528 * speed)+ 1.06449159 #Speed obtained externally
+        return corr_factor * pressure_sensor_voltage  # return corrected value
+
+    def aoa_corr_pressure(self) -> float:
         Vdd = 3.3
-        return 525 * (np.sign((self.pressure_sensor_voltage(pressure_sensor) / Vdd) - 0.5)) * (((self.pressure_sensor_voltage(pressure_sensor) / (Vdd * 0.4)) - 1.25) ** 2)
+        return 525 * (np.sign((self.aoa_corr_voltage / Vdd) - 0.5)) * (((self.aoa_corr_voltage / (Vdd * 0.4)) - 1.25) ** 2)
 
     def alpha_aoa(self) -> float:  # gives AOA of Angle of attack sensor 1
         p_avg = (self.aoa_corr_pressure(1) + self.aoa_corr_pressure(2) + self.aoa_corr_pressure(3) + self.aoa_corr_pressure(4)) / 4
         cp_alpha = (self.aoa_corr_pressure(1) - self.aoa_corr_pressure(3)) / (self.aoa_corr_pressure(5) - p_avg)
-        return (cp_alpha + self._aoa_conf.val1) / self._aoa_conf.val2  # return aoa 1
+        return (cp_alpha + self._aoa_conf.val1) / self._aoa_conf.val2  # return aoa
+
+    def beta_aoa(self) -> float:
+        p_avg = (self.aoa_corr_pressure(1) + self.aoa_corr_pressure(2) + self.aoa_corr_pressure(
+            3) + self.aoa_corr_pressure(4)) / 4
+        cp_beta = (self.aoa_corr_pressure(2) - self.aoa_corr_pressure(4)) / (self.aoa_corr_pressure(5) - p_avg)
+        return (cp_beta + self._aoa_conf.val3) / self._aoa_conf.val4  # return aos
