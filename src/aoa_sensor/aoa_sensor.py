@@ -70,21 +70,20 @@ class AoaSensor:
     def pressure_sensor_zero(self, pressure_sensor: int) -> float:
         return self._pressure_sensors[pressure_sensor]._zero
 
-    def aoa_corr_voltage(self) -> float:
-        corr_factor = (0.0114528 * speed)+ 1.06449159 #Speed obtained externally
-        return corr_factor * pressure_sensor_voltage  # return corrected value
+    def aoa_corr_voltage(self, pressure_sensor: int, speed: float) -> float:
+        corr_factor = (0.0114528 * speed) + 1.06449159 #Speed obtained externally
+        return corr_factor * self.pressure_sensor_voltage(pressure_sensor)  # return corrected value
 
-    def aoa_corr_pressure(self) -> float:
+    def aoa_corr_pressure(self, pressure_sensor: int, speed: float) -> float:
         Vdd = 3.3
-        return 525 * (np.sign((self.aoa_corr_voltage / Vdd) - 0.5)) * (((self.aoa_corr_voltage / (Vdd * 0.4)) - 1.25) ** 2)
+        return 525 * (np.sign((self.aoa_corr_voltage(pressure_sensor, speed) / Vdd) - 0.5)) * (((self.aoa_corr_voltage(pressure_sensor, speed) / (Vdd * 0.4)) - 1.25) ** 2)
 
-    def alpha_aoa(self) -> float:  # gives AOA of Angle of attack sensor 1
-        p_avg = (self.aoa_corr_pressure(1) + self.aoa_corr_pressure(2) + self.aoa_corr_pressure(3) + self.aoa_corr_pressure(4)) / 4
-        cp_alpha = (self.aoa_corr_pressure(1) - self.aoa_corr_pressure(3)) / (self.aoa_corr_pressure(5) - p_avg)
+    def alpha_aoa(self, speed: float) -> float:
+        p_avg = (self.aoa_corr_pressure(1, speed) + self.aoa_corr_pressure(2, speed) + self.aoa_corr_pressure(3, speed) + self.aoa_corr_pressure(4, speed)) / 4
+        cp_alpha = (self.aoa_corr_pressure(1, speed) - self.aoa_corr_pressure(3, speed)) / (self.aoa_corr_pressure(5, speed) - p_avg)
         return (cp_alpha + self._aoa_conf.val1) / self._aoa_conf.val2  # return aoa
 
-    def beta_aoa(self) -> float:
-        p_avg = (self.aoa_corr_pressure(1) + self.aoa_corr_pressure(2) + self.aoa_corr_pressure(
-            3) + self.aoa_corr_pressure(4)) / 4
-        cp_beta = (self.aoa_corr_pressure(2) - self.aoa_corr_pressure(4)) / (self.aoa_corr_pressure(5) - p_avg)
+    def beta_aoa(self, speed: float) -> float:
+        p_avg = (self.aoa_corr_pressure(1, speed) + self.aoa_corr_pressure(2, speed) + self.aoa_corr_pressure(3, speed) + self.aoa_corr_pressure(4, speed)) / 4
+        cp_beta = (self.aoa_corr_pressure(2, speed) - self.aoa_corr_pressure(4, speed)) / (self.aoa_corr_pressure(5, speed) - p_avg)
         return (cp_beta + self._aoa_conf.val3) / self._aoa_conf.val4  # return aos
